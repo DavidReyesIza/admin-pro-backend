@@ -8,21 +8,21 @@ const cors = require('cors');
 // Crear servidor express
 const app = express();
 
-// Configurar Cors
+// Configurar Cors es un middleware
 app.use( cors() );
+
+// Lectura o parseo  del body tambien es un middleware
+app.use(express.json());
 
 //base de datos
 dbConnection();
 
 // Rutas
-app.get('/',(request, response)=>{
 
-    response.json({
-        ok: true,
-        msg: 'Hola mundo'
-    })
+app.use('/api/usuarios',require('./routes/usuarios'));
+app.use('/api/login',require('./routes/auth'));
 
-});
+
 
 
 
