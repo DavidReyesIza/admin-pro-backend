@@ -2,6 +2,7 @@ const {response} = require('express');
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
+const { googleVerify } = require('../helpers/google-verify');
 
 const login = async(req,res = response) => {
 
@@ -53,7 +54,63 @@ const login = async(req,res = response) => {
 
 }
 
+const googleSignIn = async(req, res=response) =>{
+
+    const googleToken = req.body.token;
+
+    try {
+
+        const {name,email,picture} = await googleVerify(googleToken);
+
+        // Verificar que el email no exista
+
+        const usuarioDb = await Usuario.findOne({email});
+        let usuario;
+        if(!usuarioDb){
+
+            // Esto es si no existe el usuario
+            usuario = new Usuario({
+                nombre: name,
+                email,
+                password: '@@@',
+                img: picture,
+                google: true
+            });
+
+        }else{
+            // Existe usuario
+            usuario = usuarioDb;
+            usuarioDb.google = true;
+           // usuario.password = '@@@'; Esto lo podemos hacer por si el usuario ahora quiere usar cuenta google entonces se le cambia la contraseña anterior y se le pone esa para que solo use la de google
+        }
+
+        //Guardar en DB
+
+        await usuario.save();
+         
+        //Generar el TOKEN - JWT
+        const token = await generarJWT(usuario.id);
+
+        
+        res.json({
+            ok: true,
+            token
+        })
+    } catch (error) {
+        console.log(error);
+
+        res.status(401).json({
+            ok: false,
+            msg: 'El token no es correcto'
+           
+        })
+        
+    }
+
+}
+
 
 module.exports = {
-    login
+    login,
+    googleSignIn
 }
