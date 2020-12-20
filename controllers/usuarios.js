@@ -10,11 +10,40 @@ const { generarJWT } = require('../helpers/jwt');
 
 const getUsuarios = async(request, res)=>{
 
-    const usuarios = await Usuario.find({},'nombre email role google');
+    // esto es un query params
+    const desde= Number (request.query.desde) || 0; //esto es como un parseo el number() y el request.query.desde toma el valor que se le envia por la url
+    console.log(desde)
+
+
+
+/*     const usuarios = await Usuario
+                .find({},'nombre email role google')
+                .skip(desde) //esto hace que la paginacion empiece desde el numero que pongamos //esto es la paginacion
+                .limit(5); //esto establece el numero de objetos que se van a mostrar
+
+    const totalRegistros = await Usuario.count(); */
+
+
+
+
+   //Aca se hace una desestructuracion de arreglos para obtener los resultados de las promesas  //Este promise.all regresa un arreglo en donde la primera posicion es el resultado de la primera promesa y asi consecutivamente
+   const[usuarios,totalRegistros] = await Promise.all([ //esto sirve para agrupar mas de 1 promesa y evitar poner 2 promesas await simultaneas para evitar relantizar la aplicacion como anterior mente arriba hay 2 consecutivas
+    
+        // Primera promesa
+        Usuario
+        .find({},'nombre email role google img')
+        .skip(desde) //esto hace que la paginacion empiece desde el numero que pongamos //esto es la paginacion
+        .limit(5), //esto establece el numero de objetos que se van a mostrar
+
+
+        // Segunda Promesa
+        Usuario.countDocuments()
+    ])
 
     res.json({
         ok: true,
         usuarios,
+        totalRegistros,
         uid: request.uid  // Este uid Viene del middleware que permite pasar informacion a este GetUsuarios ya que esta a la par en el path o la ruta
         //este uid es el uid del usuario que hizo la peticion para ver los usuarios que lo provee JWT
     })
@@ -114,6 +143,7 @@ const actualizarUsuario = async (req, res = response) => {
             }
 
         }
+        
 
     campos.email = email; // aca se lo estamos regresando el valor
 
