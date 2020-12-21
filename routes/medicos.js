@@ -31,11 +31,18 @@ crearMedico);
 router.put('/:id',
 
 [
+    validarJWT,
+    check('nombre','El nombre del medico es obligatorio').not().isEmpty(),
+    check('hospital','El hospital es obligatorio').not().isEmpty(),
+
+    validarCampos
  
 ],
 actualizarMedico);
 
 router.delete('/:id',
+validarJWT,
+
 
 borrarMedico
 );
