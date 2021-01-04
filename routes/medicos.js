@@ -12,12 +12,13 @@ const {
     getMedicos,
     crearMedico,
     actualizarMedico,
-    borrarMedico
+    borrarMedico,
+    getMedicoById
 } = require('../controllers/medicos')
 
 const router = Router();
 
-router.get('/',getMedicos);
+router.get('/',validarJWT,getMedicos);
 // para las validaciones se utiliza una libreria que se instala como express-validator y tambien es un middleware
 router.post('/',[
     validarJWT,
@@ -42,9 +43,12 @@ actualizarMedico);
 
 router.delete('/:id',
 validarJWT,
-
-
 borrarMedico
+);
+
+router.get('/:id',
+validarJWT,
+getMedicoById
 );
 
 

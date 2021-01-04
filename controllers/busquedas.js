@@ -20,10 +20,6 @@ const getTodo = async(req, res=response)=>{
          Hospital.find({nombre: regex}),
     ]);
 
-
-
-    
-
     res.json({
         ok: true,
         usuarios,

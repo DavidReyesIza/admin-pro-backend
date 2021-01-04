@@ -145,7 +145,17 @@ const actualizarUsuario = async (req, res = response) => {
         }
         
 
-    campos.email = email; // aca se lo estamos regresando el valor
+        if(!usuarioDB){
+
+            campos.email = email; // aca se lo estamos regresando el valor
+        }else if(usuarioDB.email !== email){
+            return res.status(200).json({
+                ok: false,
+                msg: 'Usuarios de google no pueden cambiar su correo'
+
+            })
+
+        }
 
    
    
